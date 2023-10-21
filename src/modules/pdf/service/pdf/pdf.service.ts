@@ -232,7 +232,6 @@ export class PdfService {
   }
 
   async list() {
-    console.log(process.env.ACCESS_TOKEN);
     const d = await this.pdfModel.findAll();
     const arrayId = d.map((el) => el.request_id);
     let unique = [...new Set(arrayId)];
@@ -248,19 +247,12 @@ export class PdfService {
         headers,
       });
     } catch (e) {
-      console.log(e.response.data);
+      return(e.response.data);
     }
 
-    function getRequestStatus(requests: any, requestId: string) {
-      for (const request of requests) {
-        if (request.request_id === requestId) {
-          return request.request_status;
-        }
-      }
-      return 'Request ID not found';
-    }
+
     const statuses = unique.map((requestId) => {
-      const status = getRequestStatus(data.data.requests, requestId);
+      const status = this.getRequestStatus(data.data.requests, requestId);
       return { requestId, status };
     });
     statuses.map((el) =>
@@ -273,7 +265,6 @@ export class PdfService {
   }
 
   async submit(id: BigInt) {
-    console.log(id);
     const url = `https://sign.zoho.in/api/v1/requests/${id}/submit`;
     const headers = {
       Authorization: `Zoho-oauthtoken ${process.env.ACCESS_TOKEN}`,
@@ -308,7 +299,6 @@ export class PdfService {
     const {
       requests: { actions },
     } = body;
-    console.log(actions.length)
     for (let i = 0; i <= actions.length - 1; i++) {
       await this.pdfModel.create({
         action_id: body.requests.actions[i].action_id,
@@ -320,5 +310,31 @@ export class PdfService {
         message: body.message,
       });
     }
+  }
+  // async download(id){
+  //   const url = `https://sign.zoho.in/api/v1/requests/${id}/pdf`;
+  //   const headers = {
+  //     'Content-Type': 'application/pdf',
+  //     Authorization: `Zoho-oauthtoken ${process.env.ACCESS_TOKEN}`,
+  //   };
+  //   try {
+  //     const data = await Axios({
+  //       method: 'GET',
+  //       url,
+  //       headers,
+  //     })
+  //     return(data.data)
+  //   }catch(e){
+  //     return e.response.data
+  //   }
+  // }
+
+   getRequestStatus(requests: any, requestId: string) {
+    for (const request of requests) {
+      if (request.request_id === requestId) {
+        return request.request_status;
+      }
+    }
+    return 'Request ID not found';
   }
 }

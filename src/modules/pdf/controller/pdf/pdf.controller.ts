@@ -40,7 +40,6 @@ export class PdfController {
   @Get('list')
   async listSign(@Res() res: Response) {
     const data = await this.pdfService.list();
-    // console.log()
     return res.status(200).json(data);
   }
 
@@ -49,4 +48,10 @@ export class PdfController {
     const data = await this.pdfService.submit(id.id);
     return res.status(200).json(data);
   }
+
+  // @Get(':id/download')
+  // async download(@Param() id:any,@Res() res:Response){
+  //   const data=await this.pdfService.download(id.id)
+  //   return res.status(200).json(data)
+  // }
 }
