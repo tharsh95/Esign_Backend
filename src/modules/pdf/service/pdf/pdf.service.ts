@@ -3,6 +3,9 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Pdf } from '../../schemas/pdf.model';
 import Axios, { AxiosResponse } from 'axios';
 import * as fs from 'fs';
+// import FormData from 'form-data'
+import * as FormData from 'form-data';
+
 require('dotenv').config();
 
 @Injectable()
@@ -50,15 +53,15 @@ export class PdfService {
       },
     };
     let file: string | Blob;
-    const formData = new FormData();
-    try {
-      const filePath =
-        'C:/Users/Call4Help/Coding/Esign/backend/src/modules/pdf/service/pdf/sample.pdf';
-      const data = fs.readFileSync(filePath, 'utf8');
-      file = data;
-    } catch (err) {
-      console.error('Error reading the file:', err);
-    }
+    const formData = new FormData()
+    // try {
+    //   const filePath =
+    //     'src/modules/pdf/service/pdf/sample.pdf'
+    //   const data = fs.readFileSync(filePath, 'utf8');
+    //   file = data;
+    // } catch (err) {
+    //   console.error('Error reading the file:', err);
+    // }
     // formData.append('file', JSON.stringify(file));
     formData.append('file', JSON.stringify(buffer));
     formData.append('data', JSON.stringify(payload));
@@ -97,8 +100,6 @@ export class PdfService {
             recipient_phonenumber: '9663896862',
             recipient_name: 'Role1',
             recipient_email: 'harsh.tiwari1995@gmail.com',
-            // in_person_name: 'Lalit',
-            // in_person_email: 'lalitkumar171968@gmail.com',
             action_id: `${doc[0].action_id}`,
             signing_order: 0,
             fields: {
@@ -261,7 +262,8 @@ export class PdfService {
         { where: { request_id: el.requestId } },
       ),
     );
-    return await this.pdfModel.findAll();
+    // console.log(data.data.message)
+    return {data:await this.pdfModel.findAll(),message:data.data.message,status:data.data.status};
   }
 
   async submit(id: BigInt) {
@@ -296,6 +298,7 @@ export class PdfService {
     };
     message: any;
   }) {
+  
     const {
       requests: { actions },
     } = body;
@@ -314,7 +317,6 @@ export class PdfService {
   // async download(id){
   //   const url = `https://sign.zoho.in/api/v1/requests/${id}/pdf`;
   //   const headers = {
-  //     'Content-Type': 'application/pdf',
   //     Authorization: `Zoho-oauthtoken ${process.env.ACCESS_TOKEN}`,
   //   };
   //   try {

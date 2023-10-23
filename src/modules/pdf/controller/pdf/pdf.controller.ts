@@ -14,15 +14,17 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 
 @Controller('pdf')
-
 export class PdfController {
-
   constructor(private pdfService: PdfService) {}
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File,@Res() res:Response) {
-    const data=await this.pdfService.uploadFile(file)
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Res() res: Response,
+  ) {
+    const data = await this.pdfService.uploadFile(file);
+    console.log(data,'upload')
     res.status(200).json(data);
   }
 
@@ -39,8 +41,9 @@ export class PdfController {
 
   @Get('list')
   async listSign(@Res() res: Response) {
-    const data = await this.pdfService.list();
-    return res.status(200).json(data);
+    const { data, message,status } = await this.pdfService.list();
+    console.log(message)
+    return res.status(200).json({data,message,status});
   }
 
   @Post(':id/submit')
